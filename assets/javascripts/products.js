@@ -1,6 +1,6 @@
 /**** START OF HAT LOGIC PART 1 ****/
 
-class Hat {
+class Accessory {
     /* Constructor method of the class Hat */
     constructor(name, price, color, imageHref) {
         this.name = name;
@@ -14,11 +14,11 @@ class Hat {
         return `name: ${this.name}, color: ${this.color}, price: ${this.price}, image: ${this.imageHref}`;
     }
     //Create a new node div and add the right classes before adding the correct inner html depending on the object properties defined
-    displayHat() {
-        let hatHtml = document.createElement('div');
-        hatHtml.classList.add("accessory", "col-sm-4");
-        hatHtml.setAttribute('data-color', `${this.color}`);
-        hatHtml.innerHTML =
+    displayAccessory() {
+        let accessoryHtml = document.createElement('div');
+        accessoryHtml.classList.add("accessory", "col-sm-4");
+        accessoryHtml.setAttribute('data-color', `${this.color}`);
+        accessoryHtml.innerHTML =
             `<div class="card my-3">
             <div class="currency btn btn-light disabled">${this.price}</div>
             <img class="card-img-top" src="${this.imageHref}" alt="Image of ${this.name}">
@@ -28,14 +28,20 @@ class Hat {
               <button class="btn btn-outline-primary">Add to wishlist!</button>
             </div>
           </div>`
-        return hatHtml;
+        return accessoryHtml;
+    }
+}
+
+class Hat extends Accessory{
+    constructor(name, price, color, imageHref){
+        super(name, price, color, imageHref);
     }
 }
 
 //Function to display all the hats created in the array
-renderHats = (hats) => {
-    hats.forEach(e => {
-        productContainer.appendChild(e.displayHat());
+renderAccessories = (accessories) => {
+    accessories.forEach(e => {
+        productContainer.appendChild(e.displayAccessory());
     });
 }
 
@@ -60,8 +66,7 @@ allHats = [
 ];
 
 //Call the render hat function to render the html on the page
-renderHats(allHats);
-
+renderAccessories(allHats);
 /**** END OF HAT LOGIC PART 1 ****/
 
 
