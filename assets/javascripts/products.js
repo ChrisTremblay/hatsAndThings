@@ -16,7 +16,7 @@ class Hat {
     //Create a new node div and add the right classes before adding the correct inner html depending on the object properties defined
     displayHat() {
         let hatHtml = document.createElement('div');
-        hatHtml.classList.add("accessory", "col-sm-4");
+        hatHtml.classList.add("accessory", "col-sm-4", `${this.color}`);
         hatHtml.innerHTML =
             `<div class="card my-3">
             <div class="currency btn btn-light disabled">${this.price}</div>
@@ -67,10 +67,8 @@ renderHats(allHats);
 
 /**** START OF FILTER BY COLOR LOGIC PART 2 ****/
 highlightSelectedFilter = (selectedFilter) => {
-    let allFilters = selectedFilter.parentElement.children;
-    
-    [...allFilters].forEach(e => {
-        if(e.getAttribute("class").includes("active")){
+    [...selectedFilter.parentElement.children].forEach(e => {
+        if (e.getAttribute("class").includes("active")) {
             e.classList.remove("active");
         }
     });
