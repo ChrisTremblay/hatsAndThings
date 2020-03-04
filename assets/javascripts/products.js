@@ -38,10 +38,28 @@ class Hat extends Accessory{
     }
 }
 
+class Socks extends Accessory{
+    constructor(name, price, color, imageHref){
+        super(name, price, color, imageHref);
+    }
+}
+
+class Sunglasses extends Accessory{
+    constructor(name, price, color, imageHref){
+        super(name, price, color, imageHref);
+    }
+}
+
 //Function to display all the hats created in the array
-renderAccessories = (accessories) => {
+let renderAccessories = (accessories) => {
     accessories.forEach(e => {
         productContainer.appendChild(e.displayAccessory());
+    });
+}
+
+let removeAllAccessories = (container) => {
+    [...productContainer.children].forEach(e => {
+        container.removeChild(e);
     });
 }
 
@@ -64,6 +82,8 @@ allHats = [
     new Hat("Trilby", 10.99, "blue", "./assets/images/blue/hats/4.png"),
     new Hat("Trilby", 10.99, "yellow", "./assets/images/yellow/hats/4.png")
 ];
+let firstPageHats = JSON.stringify(allHats);
+localStorage.setItem('firstPage', firstPageHats);
 
 //Call the render hat function to render the html on the page
 renderAccessories(allHats);
@@ -84,7 +104,7 @@ highlightSelectedFilter = (selectedFilter) => {
 /*Filter logic: We first show everything to mimic the all filter and make sure to reset any filter already applied
 Then if the filter All was not selected and that the innerHTML of the filter do not correspond to the data-color attribute of the div we hide it
 */
-filterHatsByColor = (selectedFilter) => {
+let filterHatsByColor = (selectedFilter) => {
     [...productContainer.children].forEach(e => {
         e.style.display = "block";
         if (selectedFilter.innerHTML.toLowerCase() != "all") {
@@ -102,3 +122,37 @@ filtersParent.addEventListener("click", e => {
     filterHatsByColor(e.target);
 });
 /**** END OF FILTER BY COLOR LOGIC PART 2 ****/
+
+/**** PART 3 LOAD DIFFERENT TYPES OF ACCESSORIES ****/
+
+let loadRemoteAccessories = (navClicked) => {
+    if(`${navClicked.innerHTML.toLowerCase()}` != "hats"){
+        fetch(`./${navClicked.innerHTML.toLowerCase()}.json`)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(myJson) {
+            accessoriesToDisplay = myJson;
+                let newArrayAccessories = [];
+                myJson.forEach(e=>{
+                    newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
+                });
+            removeAllAccessories(productContainer);
+            renderAccessories(newArrayAccessories);
+        });
+    }else{
+        removeAllAccessories(productContainer);
+        firstPageRender = JSON.parse(localStorage.getItem("firstPage"));
+        let newArrayAccessories = [];
+        firstPageRender.forEach(e=>{
+            newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
+        });
+        renderAccessories(newArrayAccessories);
+    }
+}
+
+let navParent = document.querySelector("#navbarSupportedContent ul");
+
+navParent.addEventListener("click", e =>{
+    loadRemoteAccessories(e.target);
+});
