@@ -16,7 +16,8 @@ class Hat {
     //Create a new node div and add the right classes before adding the correct inner html depending on the object properties defined
     displayHat() {
         let hatHtml = document.createElement('div');
-        hatHtml.classList.add("accessory", "col-sm-4", `${this.color}`);
+        hatHtml.classList.add("accessory", "col-sm-4");
+        hatHtml.setAttribute('data-color', `${this.color}`);
         hatHtml.innerHTML =
             `<div class="card my-3">
             <div class="currency btn btn-light disabled">${this.price}</div>
@@ -66,6 +67,7 @@ renderHats(allHats);
 
 
 /**** START OF FILTER BY COLOR LOGIC PART 2 ****/
+//Highlight the selected filter by first removing the active class on the previous filter and then putting it on the selected one
 highlightSelectedFilter = (selectedFilter) => {
     [...selectedFilter.parentElement.children].forEach(e => {
         if (e.getAttribute("class").includes("active")) {
@@ -74,11 +76,24 @@ highlightSelectedFilter = (selectedFilter) => {
     });
     selectedFilter.classList.add("active");
 }
+/*Filter logic: We first show everything to mimic the all filter and make sure to reset any filter already applied
+Then if the filter All was not selected and that the innerHTML of the filter do not correspond to the data-color attribute of the div we hide it
+*/
+filterHatsByColor = (selectedFilter) => {
+    [...productContainer.children].forEach(e => {
+        e.style.display = "block";
+        if (selectedFilter.innerHTML.toLowerCase() != "all") {
+            if (selectedFilter.innerHTML.toLowerCase() != e.getAttribute('data-color').toLowerCase()) {
+                e.style.display = "none";
+            }
+        }
+    });
+}
 
 let filtersParent = document.querySelector("#filters .btn-group");
-
+//We listen on the parent of the filter buttons to avoid looping on each one of them and we manipulate the filter by event bubbling and the .target property
 filtersParent.addEventListener("click", e => {
     highlightSelectedFilter(e.target);
+    filterHatsByColor(e.target);
 });
-
 /**** END OF FILTER BY COLOR LOGIC PART 2 ****/
