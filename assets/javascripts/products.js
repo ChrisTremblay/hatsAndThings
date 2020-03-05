@@ -188,11 +188,10 @@ navParent.addEventListener("click", e => {
 });
 
 /**** WISHLIST PART LOGIC ****/
-sessionStorage.clear();
 let addToWishlist = (accessory) => {
-    if(sessionStorage.length < 4){
-    sessionStorage.setItem(`accessory${sessionStorage.length}`, JSON.stringify(accessory));
-    }else{
+    if (sessionStorage.length < 4) {
+        sessionStorage.setItem(`accessory${sessionStorage.length}`, JSON.stringify(accessory));
+    } else {
         alert("Wishlist already full");
     }
 }
