@@ -32,20 +32,20 @@ class Accessory {
     }
 }
 
-class Hat extends Accessory{
-    constructor(name, price, color, imageHref){
+class Hat extends Accessory {
+    constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
 
-class Socks extends Accessory{
-    constructor(name, price, color, imageHref){
+class Socks extends Accessory {
+    constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
 
-class Sunglasses extends Accessory{
-    constructor(name, price, color, imageHref){
+class Sunglasses extends Accessory {
+    constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
@@ -126,33 +126,52 @@ filtersParent.addEventListener("click", e => {
 /**** PART 3 LOAD DIFFERENT TYPES OF ACCESSORIES ****/
 
 let loadRemoteAccessories = (navClicked) => {
-    if(`${navClicked.innerHTML.toLowerCase()}` != "hats"){
+    //First we remove the display of any active filter
+    activeFilterToReset = document.querySelector("#filters .active");
+    //If there is an active filter then we remove the class active
+    if (activeFilterToReset) {
+        activeFilterToReset.classList.remove("active");
+    }
+    //If we do not click on the hats section
+    if (`${navClicked.innerHTML.toLowerCase()}` != "hats") {
+        //then we fetch the correct file thanks to the innerHTML
         fetch(`./${navClicked.innerHTML.toLowerCase()}.json`)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(myJson) {
-            accessoriesToDisplay = myJson;
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (myJson) {
+                //We create a new array of objects containing Accessories
+                accessoriesToDisplay = myJson;
                 let newArrayAccessories = [];
-                myJson.forEach(e=>{
+                myJson.forEach(e => {
                     newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
                 });
-            removeAllAccessories(productContainer);
-            renderAccessories(newArrayAccessories);
-        });
-    }else{
+                //We then remove the page
+                removeAllAccessories(productContainer);
+                //To render the page with the correct accessories selected
+                renderAccessories(newArrayAccessories);
+            });
+        //But if the hats section is clicked
+    } else {
+        //then we remove the page
         removeAllAccessories(productContainer);
+        //We convert to JSON the local string stored at the creation of the page
         firstPageRender = JSON.parse(localStorage.getItem("firstPage"));
         let newArrayAccessories = [];
-        firstPageRender.forEach(e=>{
-            newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
+        //We create a new array of hats (here we know the type before)
+        firstPageRender.forEach(e => {
+            newArrayAccessories.push(new Hat(e.name, e.price, e.color, e.imageHref))
         });
+        //And we render again the page
         renderAccessories(newArrayAccessories);
     }
 }
 
 let navParent = document.querySelector("#navbarSupportedContent ul");
 
-navParent.addEventListener("click", e =>{
-    loadRemoteAccessories(e.target);
+navParent.addEventListener("click", e => {
+    if (e.target.tagName == "BUTTON") {
+        //Prevent firing of the event when clicking next to the button
+        loadRemoteAccessories(e.target);
+    }
 });
