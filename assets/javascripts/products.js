@@ -50,6 +50,12 @@ class Sunglasses extends Accessory {
     }
 }
 
+class Gloves extends Accessory {
+    constructor(name, price, color, imageHref) {
+        super(name, price, color, imageHref);
+    }
+}
+
 //Function to display all the hats created in the array
 let renderAccessories = (accessories) => {
     accessories.forEach(e => {
@@ -84,6 +90,7 @@ allHats = [
 ];
 let firstPageHats = JSON.stringify(allHats);
 localStorage.setItem('firstPage', firstPageHats);
+localStorage.setItem('renderedPage', firstPageHats);
 
 //Call the render hat function to render the html on the page
 renderAccessories(allHats);
@@ -146,6 +153,8 @@ let loadRemoteAccessories = (navClicked) => {
                 myJson.forEach(e => {
                     newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
                 });
+                let currentRenderedPage = JSON.stringify(newArrayAccessories);
+                localStorage.setItem('renderedPage', currentRenderedPage);
                 //We then remove the page
                 removeAllAccessories(productContainer);
                 //To render the page with the correct accessories selected
@@ -162,6 +171,8 @@ let loadRemoteAccessories = (navClicked) => {
         firstPageRender.forEach(e => {
             newArrayAccessories.push(new Hat(e.name, e.price, e.color, e.imageHref))
         });
+        let currentRenderedPage = JSON.stringify(newArrayAccessories);
+        localStorage.setItem('renderedPage', currentRenderedPage);
         //And we render again the page
         renderAccessories(newArrayAccessories);
     }
@@ -173,5 +184,36 @@ navParent.addEventListener("click", e => {
     if (e.target.tagName == "BUTTON") {
         //Prevent firing of the event when clicking next to the button
         loadRemoteAccessories(e.target);
+    }
+});
+
+/**** WISHLIST PART LOGIC ****/
+sessionStorage.clear();
+let addToWishlist = (accessory) => {
+    if(sessionStorage.length < 4){
+    sessionStorage.setItem(`accessory${sessionStorage.length}`, JSON.stringify(accessory));
+    }else{
+        alert("Wishlist already full");
+    }
+}
+
+productContainer.addEventListener("click", e => {
+    if (e.target.tagName == "BUTTON") {
+        //Get the container of the accessory
+        let accessoryNode = e.target.parentNode.parentNode.parentNode;
+        //Counter to get back which accessory
+        let indexNode = 0;
+        //We browse the productContainer until we find the node clicked, get back the index of this node to browse the currentPage loaded of objects to pass it to the funtion
+        for (let i = 0; i < productContainer.children.length; i++) {
+            if (accessoryNode != productContainer.children[i]) {
+                indexNode++;
+            } else {
+                break;
+            }
+        }
+        //We get back the localstorage of the rendered page
+        let currentPage = JSON.parse(localStorage.getItem("renderedPage"));
+        //And we pass it with the correct index
+        addToWishlist(currentPage[indexNode]);
     }
 });
