@@ -45,20 +45,20 @@ let removeFromWishlist = (htmlComponent, key) => {
     /*This next part is to handle the change of the indexs when deleting, so that we can go back to the shopping list and add more wishlist items without clearing the session storage */
     //Here we re-index the data-index attribute to make it go again from 1
     let newIndexAttribute = 1;
-    [...productContainer.children].forEach(e=>{
+    [...productContainer.children].forEach(e => {
         e.setAttribute(`data-index`, newIndexAttribute);
         newIndexAttribute++;
     });
 
     //Here we reorganize the sessionStorage key values accessories so that they start again to 1
     let tempStorage = [];
-    for(let i=1; i<=sessionStorage.length; i++){
-        if(sessionStorage.getItem(`accessory${i}`)){
+    for (let i = 1; i <= sessionStorage.length; i++) {
+        if (sessionStorage.getItem(`accessory${i}`)) {
             tempStorage.push(sessionStorage.getItem(`accessory${i}`));
         }
     }
     sessionStorage.clear();
-    for(let i = 0; i<tempStorage.length; i++){
+    for (let i = 0; i < tempStorage.length; i++) {
         sessionStorage.setItem(`accessory${i+1}`, tempStorage[i]);
     }
     /* Without this part, a bug where you cannot add more items appear */
