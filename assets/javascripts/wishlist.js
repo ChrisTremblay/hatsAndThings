@@ -57,6 +57,7 @@ let removeFromWishlist = (htmlComponent, key) => {
             tempStorage.push(sessionStorage.getItem(`accessory${i}`));
         }
     }
+    //We make sure we do a clean up of the session storage to reset the list before creating the new one
     sessionStorage.clear();
     for (let i = 0; i < tempStorage.length; i++) {
         sessionStorage.setItem(`accessory${i+1}`, tempStorage[i]);

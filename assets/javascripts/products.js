@@ -1,5 +1,3 @@
-/**** START OF HAT LOGIC PART 1 ****/
-
 class Accessory {
     /* Constructor method of the class Hat */
     constructor(name, price, color, imageHref) {
@@ -17,6 +15,7 @@ class Accessory {
     displayAccessory() {
         let accessoryHtml = document.createElement('div');
         accessoryHtml.classList.add("accessory", "col-sm-4");
+        //The data-color attribute is here set to help us with filtering later on
         accessoryHtml.setAttribute('data-color', `${this.color}`);
         accessoryHtml.innerHTML =
             `<div class="card my-3">
@@ -32,24 +31,22 @@ class Accessory {
     }
 }
 
+//Not necessary but can be prepared if we ever do some extension on the different type of accessories. E.g: Size of accessories that differ in properties if this is a hat, glove or socks
 class Hat extends Accessory {
     constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
-
 class Socks extends Accessory {
     constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
-
 class Sunglasses extends Accessory {
     constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
     }
 }
-
 class Gloves extends Accessory {
     constructor(name, price, color, imageHref) {
         super(name, price, color, imageHref);
@@ -63,42 +60,38 @@ let renderAccessories = (accessories) => {
     });
 }
 
+//Function to remove all accessories present on the page when changing the filtering, we just loop over all the children of the products container to remove them one by one
 let removeAllAccessories = (container) => {
     [...productContainer.children].forEach(e => {
         container.removeChild(e);
     });
 }
 
-//Get the container of all hats
-let productContainer = document.getElementById("products");
+//Function to initialise the app: render first page with given hats (could have been loaded from a json file too but the exercice asked to leave it in the code) and also store for later the first page render as well as the current page render
+let init = () => {
+    allHats = [
+        new Hat("Baseball cap", 11.99, "red", "./assets/images/red/hats/1.png"),
+        new Hat("Baseball cap", 11.99, "blue", "./assets/images/blue/hats/1.png"),
+        new Hat("Baseball cap", 11.99, "yellow", "./assets/images/yellow/hats/1.png"),
+        new Hat("Baseball cap", 11.99, "green", "./assets/images/green/hats/1.png"),
+        new Hat("Beanie", 17.99, "red", "./assets/images/red/hats/2.png"),
+        new Hat("Beanie", 17.99, "blue", "./assets/images/blue/hats/2.png"),
+        new Hat("Beanie", 17.99, "yellow", "./assets/images/yellow/hats/2.png"),
+        new Hat("Beanie", 17.99, "green", "./assets/images/green/hats/2.png"),
+        new Hat("Straw hat", 10.99, "yellow", "./assets/images/yellow/hats/3.png"),
+        new Hat("Straw hat", 10.99, "blue", "./assets/images/blue/hats/3.png"),
+        new Hat("Trilby", 10.99, "red", "./assets/images/red/hats/4.png"),
+        new Hat("Trilby", 10.99, "blue", "./assets/images/blue/hats/4.png"),
+        new Hat("Trilby", 10.99, "yellow", "./assets/images/yellow/hats/4.png")
+    ];
+    let firstPageHats = JSON.stringify(allHats);
+    localStorage.setItem('firstPage', firstPageHats);
+    localStorage.setItem('renderedPage', firstPageHats);
 
-//Array of all the hats present in the started HTML page
-allHats = [
-    new Hat("Baseball cap", 11.99, "red", "./assets/images/red/hats/1.png"),
-    new Hat("Baseball cap", 11.99, "blue", "./assets/images/blue/hats/1.png"),
-    new Hat("Baseball cap", 11.99, "yellow", "./assets/images/yellow/hats/1.png"),
-    new Hat("Baseball cap", 11.99, "green", "./assets/images/green/hats/1.png"),
-    new Hat("Beanie", 17.99, "red", "./assets/images/red/hats/2.png"),
-    new Hat("Beanie", 17.99, "blue", "./assets/images/blue/hats/2.png"),
-    new Hat("Beanie", 17.99, "yellow", "./assets/images/yellow/hats/2.png"),
-    new Hat("Beanie", 17.99, "green", "./assets/images/green/hats/2.png"),
-    new Hat("Straw hat", 10.99, "yellow", "./assets/images/yellow/hats/3.png"),
-    new Hat("Straw hat", 10.99, "blue", "./assets/images/blue/hats/3.png"),
-    new Hat("Trilby", 10.99, "red", "./assets/images/red/hats/4.png"),
-    new Hat("Trilby", 10.99, "blue", "./assets/images/blue/hats/4.png"),
-    new Hat("Trilby", 10.99, "yellow", "./assets/images/yellow/hats/4.png")
-];
-let firstPageHats = JSON.stringify(allHats);
-localStorage.setItem('firstPage', firstPageHats);
-localStorage.setItem('renderedPage', firstPageHats);
+    //Call the render hat function to render the html on the page
+    renderAccessories(allHats);
+}
 
-//Call the render hat function to render the html on the page
-renderAccessories(allHats);
-/**** END OF HAT LOGIC PART 1 ****/
-
-
-
-/**** START OF FILTER BY COLOR LOGIC PART 2 ****/
 //Highlight the selected filter by first removing the active class on the previous filter and then putting it on the selected one
 highlightSelectedFilter = (selectedFilter) => {
     [...selectedFilter.parentElement.children].forEach(e => {
@@ -122,15 +115,19 @@ let filterHatsByColor = (selectedFilter) => {
     });
 }
 
-let filtersParent = document.querySelector("#filters .btn-group");
-//We listen on the parent of the filter buttons to avoid looping on each one of them and we manipulate the filter by event bubbling and the .target property
-filtersParent.addEventListener("click", e => {
-    highlightSelectedFilter(e.target);
-    filterHatsByColor(e.target);
-});
-/**** END OF FILTER BY COLOR LOGIC PART 2 ****/
-
-/**** PART 3 LOAD DIFFERENT TYPES OF ACCESSORIES ****/
+//Let us build and render the page based on json data
+let buildCurrentPage = (jsonData) =>{
+    let newArrayAccessories = [];
+    jsonData.forEach(e => {
+        newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
+    });
+    //Store the current rendered page locally for the wishlist use later on
+    let currentRenderedPage = JSON.stringify(newArrayAccessories);
+    localStorage.setItem('renderedPage', currentRenderedPage);
+    
+    //To render the page with the correct accessories selected
+    renderAccessories(newArrayAccessories);
+}
 
 let loadRemoteAccessories = (navClicked) => {
     //First we remove the display of any active filter
@@ -139,7 +136,10 @@ let loadRemoteAccessories = (navClicked) => {
     if (activeFilterToReset) {
         activeFilterToReset.classList.remove("active");
     }
-    //If we do not click on the hats section
+    //We then remove all accessories on the page
+    removeAllAccessories(productContainer);
+
+    //If we did not click on the hats filter
     if (`${navClicked.innerHTML.toLowerCase()}` != "hats") {
         //then we fetch the correct file thanks to the innerHTML
         fetch(`./${navClicked.innerHTML.toLowerCase()}.json`)
@@ -147,47 +147,15 @@ let loadRemoteAccessories = (navClicked) => {
                 return response.json();
             })
             .then(function (myJson) {
-                //We create a new array of objects containing Accessories
-                accessoriesToDisplay = myJson;
-                let newArrayAccessories = [];
-                myJson.forEach(e => {
-                    newArrayAccessories.push(new Accessory(e.name, e.price, e.color, e.imageHref))
-                });
-                let currentRenderedPage = JSON.stringify(newArrayAccessories);
-                localStorage.setItem('renderedPage', currentRenderedPage);
-                //We then remove the page
-                removeAllAccessories(productContainer);
-                //To render the page with the correct accessories selected
-                renderAccessories(newArrayAccessories);
+                buildCurrentPage(myJson);
             });
-        //But if the hats section is clicked
+    //But if the hats section is clicked we render the first page
     } else {
-        //then we remove the page
-        removeAllAccessories(productContainer);
-        //We convert to JSON the local string stored at the creation of the page
-        firstPageRender = JSON.parse(localStorage.getItem("firstPage"));
-        let newArrayAccessories = [];
-        //We create a new array of hats (here we know the type before)
-        firstPageRender.forEach(e => {
-            newArrayAccessories.push(new Hat(e.name, e.price, e.color, e.imageHref))
-        });
-        let currentRenderedPage = JSON.stringify(newArrayAccessories);
-        localStorage.setItem('renderedPage', currentRenderedPage);
-        //And we render again the page
-        renderAccessories(newArrayAccessories);
+        buildCurrentPage(JSON.parse(localStorage.getItem("firstPage")));
     }
 }
 
-let navParent = document.querySelector("#navbarSupportedContent ul");
-
-navParent.addEventListener("click", e => {
-    if (e.target.tagName == "BUTTON") {
-        //Prevent firing of the event when clicking next to the button
-        loadRemoteAccessories(e.target);
-    }
-});
-
-/**** WISHLIST PART LOGIC ****/
+//Function to add to the wish list the selected accessory, makes sure not more than 3. We store the accessory in the session storage to retrieve it in the session
 let addToWishlist = (accessory) => {
     if (sessionStorage.length < 4) {
         sessionStorage.setItem(`accessory${sessionStorage.length}`, JSON.stringify(accessory));
@@ -196,6 +164,20 @@ let addToWishlist = (accessory) => {
     }
 }
 
+
+//Queries of the DOM
+let productContainer = document.getElementById("products");
+let navParent = document.querySelector("#navbarSupportedContent ul");
+let filtersParent = document.querySelector("#filters .btn-group");
+
+navParent.addEventListener("click", e => {
+    if (e.target.tagName == "BUTTON") {
+        //Prevent firing of the event when clicking next to the button
+        loadRemoteAccessories(e.target);
+    }
+});
+
+//Listener on queries
 productContainer.addEventListener("click", e => {
     if (e.target.tagName == "BUTTON") {
         //Get the container of the accessory
@@ -216,3 +198,12 @@ productContainer.addEventListener("click", e => {
         addToWishlist(currentPage[indexNode]);
     }
 });
+
+//We listen on the parent of the filter buttons to avoid looping on each one of them and we manipulate the filter by event bubbling and the .target property
+filtersParent.addEventListener("click", e => {
+    highlightSelectedFilter(e.target);
+    filterHatsByColor(e.target);
+});
+
+/* INIT APP */
+init();
